@@ -1,0 +1,21 @@
+{
+  "name": "grunt-sling-file",
+  "private": true,
+  "version": "0.1.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mnlsn/grunt-slung"
+  },
+  "description": "Watch files and automatically deploy them to CRX",
+  "devDependencies": {
+    "grunt": "~0.4.2",
+    "grunt-contrib-watch": "~0.5.3"
+  },
+  "peerDependencies": {
+    "grunt": "~0.4.2"
+  },
+  "engines": {
+    "node": ">=0.8.0"
+  },
+  "license": "MIT"
+}
