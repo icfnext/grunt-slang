@@ -10,9 +10,6 @@
     "grunt": "~0.4.2",
     "grunt-contrib-watch": "~0.5.3"
   },
-  "peerDependencies": {
-    "grunt": "~0.4.2"
-  },
   "engines": {
     "node": ">=0.8.0"
   },
