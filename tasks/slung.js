@@ -3,6 +3,10 @@ var exec = require('child_process').exec;
 var path = require('path');
 
 module.exports = function(grunt) {
+
+  // This array will be used to cache the paths to avoid attempting to sling the same directory multiple times.
+  var checkedPaths = [];
+
   grunt.registerMultiTask('slung', 'Push files to a running sling instance', function() {
     var localPath = this.data.src,
         options = this.options({
@@ -54,53 +58,48 @@ module.exports = function(grunt) {
       });
     };
 
-
-    function PathBuilder () {
-
-      // used to cache the paths we've already checked...
-      var checkedPaths = [];
-
-      function builder ( path ) {
-
-        var aPath,   // stores the path as an array split on the slash
-            newPath = '', // stores the new path tree as it gets built
-            filePath = ''; // use for file creation
-
-        if ( path.substr(0,1) === '/' ) {
-          path = path.substr(1);
-        }
-
-        aPath = path.split('/');
-
-        // loop through the items
-        for (var n=0; n<aPath.length; n++) {
-
-          // check for file
-          if ( n === aPath.length - 1 && aPath[n].indexOf('.') > -1 ) {
-            filePath = ( newPath === '' ) ? '/' : newPath;
-
-            // call the method to create the file and pass it the filename and the path (which we got in the previous iteration)
-            slingFile( {file: aPath[n], path: filePath} );
-
-          // otherwise create directory structure
-          } else {
-            // append the current path with a leading slash...
-            newPath += '/' + aPath[n];
-
-            if ( checkedPaths.indexOf(newPath) < 0 ) {
-              checkedPaths.push(newPath);
-
-              // make the folder
-              slingFolder(newPath);
-            }
+    // Parses the cleaned up path and calls the appropriate sling function defined above on new paths.
+    function pathBuilder ( path ) {
+    
+      var aPath,   // stores the path as an array split on the slash
+      newPath = '', // stores the new path tree as it gets built
+      filePath = ''; // use for file creation
+    
+      if ( path.substr(0,1) === '/' ) {
+        path = path.substr(1);
+      }
+    
+      aPath = path.split('/');
+    
+      // loop through the items
+      for (var n=0; n<aPath.length; n++) {
+    
+        // check for file
+        if ( n === aPath.length - 1 && aPath[n].indexOf('.') > -1 ) {
+    
+          filePath = ( newPath === '' ) ? '/' : newPath;
+    
+          // call the method to create the file and pass it the filename and the path (which we got in the previous iteration)
+          slingFile( {file: aPath[n], path: filePath} );
+    
+        // otherwise create directory structure
+        } else {
+    
+          // append the current path with a leading slash...
+          newPath += '/' + aPath[n];
+    
+          if ( checkedPaths.indexOf(newPath) < 0 ) {
+            checkedPaths.push(newPath);
+    
+            // make the folder
+            slingFolder(newPath);
+    
           }
         }
       }
-      return builder;
     }
 
-    var pathBuilder = new PathBuilder();
-
     pathBuilder(destPath);
+    
   });
 };
