@@ -14,17 +14,32 @@ module.exports = function(grunt) {
           host: 'localhost',
           port: '4502',
           user: 'admin',
-          pass: 'admin'
+          pass: 'admin',
+          ignorePaths: false,
+          checkedPaths: []
         }),
         destPath;
+                
+    // checking if local path has jcr_root and stripping it and everything before it off
+    destPath = localPath.replace(/\\/g, '/');
+    if (path.dirname(destPath).indexOf('jcr_root/') !== -1) {
+      destPath = destPath.substring(path.dirname(destPath).indexOf('jcr_root/') + 9);
+    }
 
-        // checking if local path has jcr_root and stripping it and everything before it off
-        if (path.dirname(localPath).indexOf('jcr_root/') !== -1) {
-          destPath = localPath.substring(path.dirname(localPath).indexOf('jcr_root/') + 9);
-        } else {
-          destPath = localPath;
+    var mergeCheckedPaths = function mergeCheckedPaths(target, additions) {
+        target = (target || []);
+        additions = (additions || []);
+        for(var x=0;x<additions.length;x++){
+            var value = additions[x].replace(/\\/g,'/');
+            if (value[0] !== '/') {
+              value = '/' + value;
+            }
+            if(target.indexOf(value) < 0){
+              target.push(value);
+            }
         }
-
+    };
+        
     // piecing together the curl command to push the file to sling
     var slingFile = function slingFile(path) {
       var command = 'curl -i -X POST -F';
@@ -46,6 +61,7 @@ module.exports = function(grunt) {
 
     //piecing together the curl command to push the folders to sling
     var slingFolder = function slingFolder(path) {
+      grunt.log.writeln('create folder: ' + path);
       var command = 'curl -i -X POST -F"jcr:primaryType=nt:folder" -u ' + options.user + ':' + options.pass + ' http://' + options.host + ':' + options.port + path;
       grunt.verbose.writeln('command: ' + command);
 
@@ -88,17 +104,19 @@ module.exports = function(grunt) {
           // append the current path with a leading slash...
           newPath += '/' + aPath[n];
     
-          if ( checkedPaths.indexOf(newPath) < 0 ) {
+          if (checkedPaths.indexOf(newPath) < 0) {
             checkedPaths.push(newPath);
-    
-            // make the folder
-            slingFolder(newPath);
-    
+            
+            if (!options.ignorePaths) {
+                // make the folder
+                slingFolder(newPath);
+            }    
           }
         }
       }
     }
 
+    mergeCheckedPaths(checkedPaths, options.checkedPaths);
     pathBuilder(destPath);
     
   });
