@@ -7,7 +7,7 @@ module.exports = function(grunt) {
   // This array will be used to cache the paths to avoid attempting to sling the same directory multiple times.
   var checkedPaths = [];
 
-  grunt.registerMultiTask('slung', 'Push files to a running sling instance', function() {
+  grunt.registerMultiTask('slang', 'Push files to a running sling instance', function() {
     var localPath = this.data.src,
         options = this.options({
           stdout: false,
@@ -48,7 +48,7 @@ module.exports = function(grunt) {
           command += ' http://' + options.host + ':' + options.port + path.path;
 
       grunt.log.writeln('file: ' + localPath);
-      grunt.log.writeln('slung to: ' + path.path + '/' + path.file);
+      grunt.log.writeln('slang to: ' + path.path + '/' + path.file);
 
       exec(command, function (error, stdout, stderr) {
         if (error !== null) {
