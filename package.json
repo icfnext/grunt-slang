@@ -1,9 +1,9 @@
 {
-  "name": "grunt-slung",
+  "name": "grunt-slang",
   "version": "0.1.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/mnlsn/grunt-slung"
+    "url": "https://github.com/mnlsn/grunt-slang"
   },
   "description": "Watch files and automatically deploy them to CRX",
   "devDependencies": {
