@@ -48,7 +48,7 @@ module.exports = function(grunt) {
           command += ' http://' + options.host + ':' + options.port + path.path;
 
       grunt.log.writeln('file: ' + localPath);
-      grunt.log.writeln('slang to: ' + path.path + '/' + path.file);
+      grunt.log.writeln('slang to: ' + 'http://' + options.host + ':' + options.port + path.path + '/' + path.file);
 
       exec(command, function (error, stdout, stderr) {
         if (error !== null) {
