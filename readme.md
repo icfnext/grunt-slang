@@ -19,11 +19,11 @@ npm automatically translates "SchwaFa/grunt-slang" to the proper GitHub URL.
 slang: {
   // AEM author configuration
   author: {
-   		options: {
-   		  host: 'dev.example.com',
-   			port: '4502',
-   			ignorePaths: true
-   		}
+   	options: {
+   	  host: 'dev.example.com',
+   		port: '4502',
+   		ignorePaths: true
+   	}
   },
   // AEM publish configuration
   publish: {
@@ -31,7 +31,7 @@ slang: {
   	  host: 'dev.example.com',
   		port: '4503',
   		ignorePaths: true
-  	}
+    }
   }
-  }
+}
 ```
