@@ -52,7 +52,7 @@ module.exports = function(grunt) {
 
       exec(command, function (error, stdout, stderr) {
         if (error !== null) {
-          grunt.log.writeln('Slang ERROR: Could not deploy ' + path.file + ' to AEM\'s CRX')
+          grunt.log.writeln('Slang ERROR: Could not deploy ' + path.file + ' to AEM\'s CRX at ' + options.host + ':' + options.port);
           grunt.verbose.writeln('exec error: ' + error);
         } else {
           grunt.log.writeln('Slang ' + path.file + ' successfully to AEM');
