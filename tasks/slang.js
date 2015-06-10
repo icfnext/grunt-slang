@@ -47,13 +47,15 @@ module.exports = function(grunt) {
           command += ' -u ' + options.user + ':' + options.pass;
           command += ' http://' + options.host + ':' + options.port + path.path;
 
-      grunt.log.writeln('file: ' + localPath);
-      grunt.log.writeln('slang to: ' + path.path + '/' + path.file);
+      grunt.log.writeln('Slinging file ' + localPath);
+      grunt.log.writeln('to AEM at ' + 'http://' + options.host + ':' + options.port + path.path + '/' + path.file);
 
       exec(command, function (error, stdout, stderr) {
         if (error !== null) {
+          grunt.log.writeln('Slang ERROR: Could not deploy ' + path.file + ' to AEM\'s CRX at ' + options.host + ':' + options.port);
           grunt.verbose.writeln('exec error: ' + error);
         } else {
+          grunt.log.writeln('Slang ' + path.file + ' successfully to AEM');
           grunt.verbose.writeln('Response: ' + stdout);
         }
       });
