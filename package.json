@@ -1,17 +1,18 @@
 {
   "name": "grunt-slang",
-  "version": "0.1.5",
+  "version": "1.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/mnlsn/grunt-slang"
   },
   "description": "Watch files and automatically deploy them to CRX",
-  "devDependencies": {
-    "grunt": "~0.4.2",
-    "grunt-contrib-watch": "~0.5.3"
-  },
   "engines": {
-    "node": ">=0.8.0"
+    "node": ">=4.0"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "grunt": "^0.4.5",
+    "grunt-contrib-watch": "^0.5.3",
+    "request": "^2.67.0"
+  }
 }
