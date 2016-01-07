@@ -7,7 +7,7 @@
   },
   "description": "Watch files and automatically deploy them to CRX",
   "engines": {
-    "node": ">=4.0"
+    "node": ">=4.0.0"
   },
   "license": "MIT",
   "dependencies": {
