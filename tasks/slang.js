@@ -17,6 +17,7 @@ module.exports = function(grunt) {
         var PORT = options.port || 4502;
         var USER = options.user || 'admin';
         var PASS = options.pass || 'admin';
+        var CONTEXT = options.context;
 
         // if jcr_root is in file system path, remove before setting destination
         destPath = localPath;
@@ -27,7 +28,7 @@ module.exports = function(grunt) {
 
         // create full URL for curl path
         var URL = 'http://' + USER + ':' + PASS + '@' + HOST + ':' + PORT + '/' +
-            path.dirname(destPath) + '.json';
+                  (CONTEXT ?  CONTEXT + '/' : '') + path.dirname(destPath) + '.json';
 
         requestOptions = {
             url: URL,
