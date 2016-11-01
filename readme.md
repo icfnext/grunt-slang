@@ -46,9 +46,19 @@ watch: {
 You also need to set the path to the modified file on every watch event, since we only want to upload modified files/folders and not everything:
 
 ```
-// we only want to upload the modified file to AEM, not all files
+// we only want to grunt-slang the modified file(s) to AEM, not all files
 grunt.event.on('watch', function(action, filepath) {
- 	grunt.config.set('slang.author.src', filepath);
- 	grunt.config.set('slang.publish.src', filepath);
+    var config         = grunt.config,
+        log            = grunt.log,
+        authorSources  = Array.isArray(config.get('slang.author.sources')) ? config.get('slang.author.sources') : [],
+        publishSources = Array.isArray(config.get('slang.publish.sources')) ? config.get('slang.publish.sources') : [];
+    log.debug('event: watch: action   = ' + action);
+    log.debug('event: watch: filepath = ' + filepath);
+
+    authorSources.push(filepath);
+    publishSources.push(filepath);
+
+    config.set('slang.author.sources', authorSources);
+    config.set('slang.publish.sources', publishSources);
 });
 ```
