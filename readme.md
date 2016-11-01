@@ -7,39 +7,39 @@
 ### Usage Example
 ```js
 slang: {
-  // AEM author configuration
-  author: {
+  author: { // AEM author configuration
    	options: {
    	  host: 'dev.example.com',
    	  port: '4502',
+      user: 'username',
+      pass: 'password',
    	  ignorePaths: true
    	}
   },
-  // AEM publish configuration
-  publish: {
+  publish: { // AEM publish configuration
   	options: {
   	  host: 'dev.example.com',
   	  port: '4503',
+      user: 'username',
+      pass: 'password',
   	  ignorePaths: true
     }
   }
 },
 watch: {
-	// watch task for AEM author
-	author: {
-    files: ['<%= pathTo.projectDesign %>**/*.{css,html,js,jsp,txt}'],
-		tasks: ['slang:author'],
-		options: {
-			spawn: false
-	  }
-	},
-	// watch task for AEM publish
-	publish: {
-	  files: ['<%= pathTo.projectDesign %>**/*.{css,html,js,jsp,txt}'],
-		  tasks: ['slang:publish'],
-		  options: {
-		    spawn: false
-		  }
+  author: { // watch task for AEM author
+  files: ['<%= pathTo.projectDesign %>**/*.{css,html,js,jsp,txt}'],
+	tasks: ['slang:author'],
+	options: {
+	  spawn: false
+    }
+  },
+publish: { // watch task for AEM publish
+  files: ['<%= pathTo.projectDesign %>**/*.{css,html,js,jsp,txt}'],
+  tasks: ['slang:publish'],
+    options: {
+	  spawn: false
+    }
   }
 }
 ```
