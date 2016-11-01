@@ -7,48 +7,58 @@
 ### Usage Example
 ```js
 slang: {
-  // AEM author configuration
-  author: {
+  author: { // AEM author configuration
    	options: {
    	  host: 'dev.example.com',
    	  port: '4502',
+      user: 'username',
+      pass: 'password',
    	  ignorePaths: true
    	}
   },
-  // AEM publish configuration
-  publish: {
+  publish: { // AEM publish configuration
   	options: {
   	  host: 'dev.example.com',
   	  port: '4503',
+      user: 'username',
+      pass: 'password',
   	  ignorePaths: true
     }
   }
 },
 watch: {
-	// watch task for AEM author
-	author: {
-    files: ['<%= pathTo.projectDesign %>**/*.{css,html,js,jsp,txt}'],
-		tasks: ['slang:author'],
-		options: {
-			spawn: false
-	  }
-	},
-	// watch task for AEM publish
-	publish: {
-	  files: ['<%= pathTo.projectDesign %>**/*.{css,html,js,jsp,txt}'],
-		  tasks: ['slang:publish'],
-		  options: {
-		    spawn: false
-		  }
+  author: { // watch task for AEM author
+  files: ['<%= pathTo.projectDesign %>**/*.{css,html,js,jsp,txt}'],
+	tasks: ['slang:author'],
+	options: {
+	  spawn: false
+    }
+  },
+publish: { // watch task for AEM publish
+  files: ['<%= pathTo.projectDesign %>**/*.{css,html,js,jsp,txt}'],
+  tasks: ['slang:publish'],
+    options: {
+	  spawn: false
+    }
   }
 }
 ```
 You also need to set the path to the modified file on every watch event, since we only want to upload modified files/folders and not everything:
 
 ```
-// we only want to upload the modified file to AEM, not all files
+// we only want to grunt-slang the modified file(s) to AEM, not all files
 grunt.event.on('watch', function(action, filepath) {
- 	grunt.config.set('slang.author.src', filepath);
- 	grunt.config.set('slang.publish.src', filepath);
+    var config         = grunt.config,
+        log            = grunt.log,
+        authorSources  = Array.isArray(config.get('slang.author.sources')) ? config.get('slang.author.sources') : [],
+        publishSources = Array.isArray(config.get('slang.publish.sources')) ? config.get('slang.publish.sources') : [];
+    log.debug('event: watch: action   = ' + action);
+    log.debug('event: watch: filepath = ' + filepath);
+
+    authorSources.push(filepath);
+    publishSources.push(filepath);
+
+    config.set('slang.author.sources', authorSources);
+    config.set('slang.publish.sources', publishSources);
 });
 ```
