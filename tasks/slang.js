@@ -7,30 +7,35 @@ module.exports = function(grunt) {
     'use strict';
 
     grunt.registerMultiTask('slang', 'Push files to a running sling instance', function() {
-        var srcWatch    = 'slang.'+this.target+'.sources',
-            sources     = this.data.sources,
-            options     = this.options(),
-            config      = grunt.config,
-            debug       = !!grunt.option('debug'),
-            log         = grunt.log;
+        var srcWatch = 'slang.'+this.target+'.sources',
+            sources  = this.data.sources,
+            options  = this.options(),
+            config   = grunt.config,
+            log      = grunt.log,
+            debug    = !!grunt.option('debug');
         log.writeflags(options, 'options');
-        if(debug){
-            log.writeflags(sources, 'sources');
-        }
+        if(debug) log.writeflags(sources, 'sources');
 
         function soThen(error, requestResponse, body) {
             log.debug('body = '+body);
-            if(debug) log.writeflags(requestResponse);
             try{
-                var body     = JSON.parse(body),
-                    status   = body['status.code'] || -1,
-                    message  = body['status.message'] || 'supposed to be body["status.message"]';
+                var body    = JSON.parse(body),
+                    changes = body.changes || [],
+                    status  = body['status.code'] || -1,
+                    message = body['status.message'] || 'body["status.message"]';
                 if(error){
                     log.error('upload: '+status+' - '+message);
                 }else{
                     log.subhead(body.title);
                     if(status === 200 || status === 201) {
                         log.ok('upload: '+status+' - '+message);
+                        if(Array.isArray(changes) === true && changes.length > 0) {
+                            log.subhead('Changes:');
+                            for(var i = 0, k = changes.length; i < k; i++) {
+                                log.ok((changes[i].type || 'body.changes[i].type')+': '+(changes[i].argument || 'body.changes[i].argument'));
+                            }
+                            log.writeln('location: '+(body.location || 'body.location')+', parentLocation: '+(body.parentLocation || 'body.parentLocation'));
+                        }
                     }else{
                         log.error('upload: '+status+' - '+message);
                     }
