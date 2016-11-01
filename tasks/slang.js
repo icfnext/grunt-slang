@@ -7,64 +7,67 @@ module.exports = function(grunt) {
     'use strict';
 
     grunt.registerMultiTask('slang', 'Push files to a running sling instance', function() {
-        var localPath = this.data.src;
-        var options = this.options();
-        var log = grunt.log;
-        var destPath,
-            requestOptions;
-
-        var HOST = options.host || 'localhost';
-        var PORT = options.port || 4502;
-        var USER = options.user || 'admin';
-        var PASS = options.pass || 'admin';
-
-        // if jcr_root is in file system path, remove before setting destination
-        destPath = localPath;
-        if (path.dirname(destPath).indexOf('jcr_root/') !== -1) {
-            destPath = destPath.substring(path.dirname(destPath)
-                .indexOf('jcr_root/') + 9);
+        var srcWatch    = 'slang.'+this.target+'.sources',
+            sources     = this.data.sources,
+            options     = this.options(),
+            config      = grunt.config,
+            debug       = !!grunt.option('debug'),
+            log         = grunt.log;
+        log.writeflags(options, 'options');
+        if(debug){
+            log.writeflags(sources, 'sources');
         }
 
-        // create full URL for curl path
-        var URL = 'http://' + USER + ':' + PASS + '@' + HOST + ':' + PORT + '/' +
-            path.dirname(destPath) + '.json';
-
-        requestOptions = {
-            url: URL,
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json'
-            }
-        }
-
-        function optionalCallback(err, httpResponse, responseBody) {
-            if (err) {
-                log.error('File Upload Failed');
-            }
-
-            try {
-                var response = JSON.parse(responseBody);
-
-                var status = response['status.code'] ? response['status.code'] : 201;
-                var message = response['status.message'] ? response['status.message'] : 'File Created';
-                var location = response['location'] ? response['location'] : destPath;
-
-                if (status === 200 || status === 201) {
-                    log.writeln('File Upload Successful on port ' + PORT + ' : ' + status + ' - ' + message);
-                    log.writeln('Uploaded to: ' + location);
-                } else {
-                    log.error('File Upload Failed: ' + status + ' - ' + message);
+        function soThen(error, requestResponse, body) {
+            log.debug('body = '+body);
+            if(debug) log.writeflags(requestResponse);
+            try{
+                var body     = JSON.parse(body),
+                    status   = body['status.code'] || -1,
+                    message  = body['status.message'] || 'supposed to be body["status.message"]';
+                if(error){
+                    log.error('upload: '+status+' - '+message);
+                }else{
+                    log.subhead(body.title);
+                    if(status === 200 || status === 201) {
+                        log.ok('upload: '+status+' - '+message);
+                    }else{
+                        log.error('upload: '+status+' - '+message);
+                    }
                 }
-            } catch(err) {
-                log.error('File Upload Failed - Check Username and Password');
+            }catch(error){
+                log.error('error - message = "'+error.message+', stack: '+error.stack)
             }
         }
+        if(Array.isArray(sources) === true){
+            var hostport = (options.protocol || 'http')+'://'+(options.host || 'localhost')+':'+(options.port || '4502'),
+                username = options.user || 'admin',
+                password = options.pass || 'admin';
+            for(var i = 0, k = sources.length; i < k; i++) {
+                var origin      = sources[i],
+                    destination = path.dirname(origin),
+                    postOptions = { formData: {}, headers: { 'Accept': 'application/json' }, url: '' },
+                    prefixIndex = destination.indexOf('jcr_root/'),
+                    isJrcRoot   = (prefixIndex !== -1);
+                if(isJrcRoot){ // remove path part, jcr_root and before
+                    destination = destination.substring(prefixIndex + 8);
+                }
+                log.debug('origin      = "'+origin+'"');
+                log.debug('destination = "'+destination+'"');
 
-        var r = request(requestOptions, optionalCallback).auth(USER, PASS);
-
-        var form = r.form();
-
-        form.append('*', fs.createReadStream(localPath));
-        form.append('@TypeHint', 'nt:file');
+                postOptions.formData = { '*': fs.createReadStream(origin), '@TypeHint': 'nt:file' };
+                postOptions.url      = hostport+destination+'.json';
+                if(debug) log.writeflags(postOptions, 'postOptions');
+                
+                log.debug('attempting upload of "'+origin+'" to "'+postOptions.url+'"');
+                request.post(postOptions, soThen).auth(username, password).on('error', function() {
+                    log.error('upload failed: ', error);
+                });
+            }
+        }else{
+            log.error('i was called to upload changes, but there are no array of changed file paths ... (doh).');
+        }
+        log.debug('srcWatch = '+srcWatch);
+        config.set(srcWatch, []); // wipe changed source paths array
     });
 };
