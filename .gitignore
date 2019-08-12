@@ -1,3 +1,4 @@
 node_modules
 etc
 package-lock.json
+.idea
